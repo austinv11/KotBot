@@ -49,7 +49,7 @@ public class Discord4JWrapper(val email: String, val password: String) {
         fileWatchThread.interrupt()
     }
     
-    private inline fun createClient(): IDiscordClient {
+    private fun createClient(): IDiscordClient {
         val client = ClientBuilder().withLogin(email, password).login()
         client.dispatcher.registerListener(IListener<DiscordDisconnectedEvent> {event -> 
             if (isReloading) {
