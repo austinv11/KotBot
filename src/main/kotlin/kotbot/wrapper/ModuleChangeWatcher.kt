@@ -46,6 +46,7 @@ class ModuleChangeWatcher : Runnable {
                 val kind: WatchEvent.Kind<*> = event.kind()
                 val pathEvent: WatchEvent<Path> = event as WatchEvent<Path>
                 KotBot.LOGGER.trace("File watcher update: ${kind.name()} in ${pathEvent.context().fileName}")
+                KotBot.LOGGER.info("File change!Reloading bot in $TIME_TO_WAIT_FOR_RELOAD seconds...")
                 lastFileChangeTime = System.currentTimeMillis()
             }
             

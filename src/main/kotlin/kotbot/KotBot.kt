@@ -10,7 +10,12 @@ public fun main(args: Array<String>) {
     if (args.size < 2)
         throw IllegalArgumentException("Expected at least two arguments (email, password)")
     
-    KotBot.WRAPPER = Discord4JWrapper(args[0], args[1])
+    try {
+        KotBot.WRAPPER = Discord4JWrapper(args[0], args[1])
+    } catch(e: RuntimeException) {
+        KotBot.LOGGER.error("Unable to start wrapper! Aborting launch...", e)
+        return
+    }
 }
 
 public class KotBot {
