@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory
 public fun main(args: Array<String>) {
     if (args.size < 2)
         throw IllegalArgumentException("Expected at least two arguments (email, password)")
+    
     try {
         KotBot.WRAPPER = Discord4JWrapper(args[0], args[1])
     } catch(e: RuntimeException) {

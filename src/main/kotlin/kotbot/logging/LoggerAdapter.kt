@@ -1,6 +1,7 @@
 package kotbot.logging
 
 import org.slf4j.helpers.MarkerIgnoringBase
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.time.LocalDateTime
@@ -15,10 +16,18 @@ class LoggerAdapter() : MarkerIgnoringBase() {
      */
     constructor(name: String) : this() {
         this.name = name;
+        
+        if (CLEAR_LOG_FILES_ON_SHUTDOWN) {
+            ERROR_LOG_FILE.deleteOnExit()
+            LOG_FILE.deleteOnExit()
+        }
     }
 
     companion object {
-        var LOG_LEVEL: Level = Level.TRACE
+        var LOG_LEVEL: Level = Level.DEBUG
+        var CLEAR_LOG_FILES_ON_SHUTDOWN: Boolean = true
+        val ERROR_LOG_FILE: File = File("./errors.log")
+        val LOG_FILE: File = File("./bot.log")
     }
     
     override fun warn(p0: String?) {
@@ -147,9 +156,12 @@ class LoggerAdapter() : MarkerIgnoringBase() {
         
         if (level == Level.ERROR || level == Level.WARN) {
             System.err.println(logMessage)
+            if (level == Level.ERROR) 
+                ERROR_LOG_FILE.appendText("$logMessage\n")
         } else {
             System.out.println(logMessage)
         }
+        LOG_FILE.appendText("$logMessage\n")
         
         if (error != null) {
             var writer = StringWriter()
