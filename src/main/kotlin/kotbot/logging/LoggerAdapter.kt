@@ -17,6 +17,10 @@ class LoggerAdapter() : MarkerIgnoringBase() {
         this.name = name;
     }
 
+    companion object {
+        var LOG_LEVEL: Level = Level.TRACE
+    }
+    
     override fun warn(p0: String?) {
         log(Level.WARN, p0?: "")
     }
@@ -128,6 +132,9 @@ class LoggerAdapter() : MarkerIgnoringBase() {
     override fun isTraceEnabled() = true
     
     private fun log(level: Level, message: String, toReplace: Array<out Any?>? = null, error: Throwable? = null) {
+        if (LOG_LEVEL < level)
+            return
+        
         var logMessage = "[$level][${LocalDateTime.now().toString()}][${getName()}] ";
         
         logMessage += message;
