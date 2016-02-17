@@ -1,30 +1,23 @@
 package kotbot
 
-import kotbot.wrapper.ModuleChangeWatcher
+import kotbot.wrapper.Discord4JWrapper
 import org.slf4j.LoggerFactory
 
 /**
  * A wrapper for Discord4J which allows for continuous uptime even through reloads.
  */
 public fun main(args: Array<String>) {
-    val fileWatchThread: Thread = Thread(ModuleChangeWatcher())
-    fileWatchThread.start()
+    if (args.size < 2)
+        throw IllegalArgumentException("Expected at least two arguments (email, password)")
+    
+    KotBot.WRAPPER = Discord4JWrapper(args[0], args[1])
 }
 
 public class KotBot {
     
-   companion object {
+    companion object {
         val LOGGER = LoggerFactory.getLogger("KotBot")
-        val INSTANCE = KotBot()
-        var isReloading: Boolean = false
         
-        fun onFileChange() {
-            isReloading = true
-            INSTANCE.reload()
-        }
-    }
-    
-    fun reload() {
-        LOGGER.info("Module change detected! Preparing for restart.")
+        var WRAPPER: Discord4JWrapper? = null
     }
 }

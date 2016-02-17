@@ -34,8 +34,8 @@ class ModuleChangeWatcher : Runnable {
         while (true) {
             if (lastFileChangeTime != -1.toLong()) {
                 if (System.currentTimeMillis()-(lastFileChangeTime) >= (TIME_TO_WAIT_FOR_RELOAD*1000) 
-                        && !KotBot.isReloading) { //Don't want to deal with concurrent reload attempts
-                    KotBot.onFileChange()
+                        && !KotBot.WRAPPER!!.isReloading) { //Don't want to deal with concurrent reload attempts
+                    KotBot.WRAPPER!!.reload()
                     lastFileChangeTime = -1
                 }
             }
