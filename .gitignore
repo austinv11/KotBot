@@ -115,6 +115,7 @@ gradle-app.setting
 # Misc
 !lib/*.jar
 *.log
-modules
+/modules
+config.json
 
 # Created by .ignore support plugin (hsz.mobi)

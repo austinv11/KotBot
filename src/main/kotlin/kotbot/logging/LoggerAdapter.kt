@@ -17,15 +17,15 @@ class LoggerAdapter() : MarkerIgnoringBase() {
     constructor(name: String) : this() {
         this.name = name;
         
-        if (CLEAR_LOG_FILES_ON_SHUTDOWN) {
-            ERROR_LOG_FILE.deleteOnExit()
-            LOG_FILE.deleteOnExit()
+        if (CLEAR_LOG_FILES_ON_STARTUP) {
+            ERROR_LOG_FILE.delete()
+            LOG_FILE.delete()
         }
     }
 
     companion object {
         var LOG_LEVEL: Level = Level.DEBUG
-        var CLEAR_LOG_FILES_ON_SHUTDOWN: Boolean = true
+        var CLEAR_LOG_FILES_ON_STARTUP: Boolean = true
         val ERROR_LOG_FILE: File = File("./errors.log")
         val LOG_FILE: File = File("./bot.log")
     }
