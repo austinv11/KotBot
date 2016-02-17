@@ -3,6 +3,7 @@ package kotbot.wrapper
 import kotbot.KotBot
 import java.io.File
 import java.nio.file.*
+import java.util.*
 
 /**
  * This waits for a change in ./modules and when found waits `ModuleChangeWatcher.TIME_TO_WAIT_FOR_RELOAD` seconds to 
@@ -11,7 +12,7 @@ import java.nio.file.*
 class ModuleChangeWatcher : Runnable {
     
     val watcher: WatchService = FileSystems.getDefault().newWatchService()
-    var lastFileChangeTime: Long = -1;
+    var reloadQueued: Boolean = false
     
     constructor() {
         if (!MODULE_DIR.exists())
@@ -32,22 +33,22 @@ class ModuleChangeWatcher : Runnable {
     
     override fun run() {
         while (true) {
-            if (lastFileChangeTime != -1.toLong()) {
-                if (System.currentTimeMillis()-(lastFileChangeTime) >= (TIME_TO_WAIT_FOR_RELOAD*1000) 
-                        && !KotBot.WRAPPER!!.isReloading) { //Don't want to deal with concurrent reload attempts
-                    KotBot.WRAPPER!!.reload()
-                    lastFileChangeTime = -1
-                }
-            }
-            
             val key: WatchKey = watcher.take()
             
             for (event: WatchEvent<*> in key.pollEvents()) {
                 val kind: WatchEvent.Kind<*> = event.kind()
                 val pathEvent: WatchEvent<Path> = event as WatchEvent<Path>
                 KotBot.LOGGER.trace("File watcher update: ${kind.name()} in ${pathEvent.context().fileName}")
-                KotBot.LOGGER.info("File change!Reloading bot in $TIME_TO_WAIT_FOR_RELOAD seconds...")
-                lastFileChangeTime = System.currentTimeMillis()
+                if (!reloadQueued && !KotBot.WRAPPER!!.isReloading) {
+                    KotBot.LOGGER.info("File change! Reloading bot in $TIME_TO_WAIT_FOR_RELOAD seconds...")
+                    reloadQueued = true
+                    Timer().schedule(object: TimerTask() {
+                        override fun run() {
+                            KotBot.WRAPPER!!.reload()
+                            reloadQueued = false
+                        }
+                    }, (TIME_TO_WAIT_FOR_RELOAD * 1000).toLong())
+                }
             }
             
             if (!key.reset())

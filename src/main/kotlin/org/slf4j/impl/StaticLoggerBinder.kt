@@ -13,8 +13,10 @@ public class StaticLoggerBinder : LoggerFactoryBinder {
     companion object {
         const val REQUESTED_API_VERSION: String = "1.6.99" //Required field
         
+        val BINDER = StaticLoggerBinder()
+        
         @JvmStatic
-        fun getSingleton() : StaticLoggerBinder = StaticLoggerBinder() //Required function
+        fun getSingleton() : StaticLoggerBinder = BINDER//Required function
     }
     
     override fun getLoggerFactory() = LoggerFactory()

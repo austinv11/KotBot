@@ -33,6 +33,7 @@ public class Discord4JWrapper(val email: String, val password: String) {
         
         try {
             nextClient = createClient()
+            currentClient.logout()
         } catch (e: Exception) {
             KotBot.LOGGER.error("Error initializing new client, aborting reload.", e)
             isReloading = false
@@ -48,7 +49,7 @@ public class Discord4JWrapper(val email: String, val password: String) {
         fileWatchThread.interrupt()
     }
     
-    private fun createClient(): IDiscordClient {
+    private inline fun createClient(): IDiscordClient {
         val client = ClientBuilder().withLogin(email, password).login()
         client.dispatcher.registerListener(IListener<DiscordDisconnectedEvent> {event -> 
             if (isReloading) {
@@ -59,7 +60,6 @@ public class Discord4JWrapper(val email: String, val password: String) {
                     KotBot.LOGGER.warn("Error initializing new client, aborting reload.")
                     isReloading = false
                 }
-                nextClient = null
             } else {
                 if (!isCloseRequested) {
                     KotBot.LOGGER.warn("Bot unexpectedly shut down for reason ${event.reason}! Attempting reload...")
@@ -73,7 +73,8 @@ public class Discord4JWrapper(val email: String, val password: String) {
             if (isReloading) {
                 if (client === nextClient) {
                     KotBot.LOGGER.info("Secondary client completed loading.")
-                    currentClient.logout()
+                    nextClient = null
+                    isReloading = false
                 } else {
                     KotBot.LOGGER.error("Umm, what just happened? Tell the author ASAP!")
                 }
