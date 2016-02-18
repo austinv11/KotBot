@@ -6,6 +6,8 @@ import kotbot.configuration.fromJsonWithComments
 import kotbot.configuration.toJsonWithComments
 import kotbot.wrapper.Discord4JWrapper
 import org.slf4j.LoggerFactory
+import sx.blah.discord.api.IDiscordClient
+import sx.blah.discord.handle.impl.events.ReadyEvent
 import java.io.File
 
 /**
@@ -31,16 +33,27 @@ public fun main(args: Array<String>) {
         return
     }
     
-    KotBot.CONFIG_FILE.writeText(KotBot.GSON.toJsonWithComments(KotBot.CONFIG))
+    KotBot.updateConfigFile()
 }
 
 public class KotBot {
+    
+    var client: IDiscordClient? = null
     
     companion object {
         val LOGGER = LoggerFactory.getLogger("KotBot")
         val GSON = GsonBuilder().setPrettyPrinting().serializeNulls().create()
         val CONFIG_FILE = File("./config.json")
+        val INSTANCE = KotBot()
         var WRAPPER: Discord4JWrapper? = null
         var CONFIG: Config = Config()
+        
+        fun updateConfigFile() {
+            KotBot.CONFIG_FILE.writeText(KotBot.GSON.toJsonWithComments(KotBot.CONFIG))
+        }
+    }
+    
+    fun onReady(event: ReadyEvent) {
+        client = event.client
     }
 }

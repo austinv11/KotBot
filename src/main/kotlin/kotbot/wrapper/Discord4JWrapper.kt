@@ -75,11 +75,13 @@ public class Discord4JWrapper(val email: String, val password: String) {
                     KotBot.LOGGER.info("Secondary client completed loading.")
                     nextClient = null
                     isReloading = false
+                    KotBot.INSTANCE.onReady(event)
                 } else {
                     KotBot.LOGGER.error("Umm, what just happened? Tell the author ASAP!")
                 }
             } else {
                 KotBot.LOGGER.info("Completed initial client initialization, logged in as ${client.ourUser.name}")
+                KotBot.INSTANCE.onReady(event)
             }
         })
         return client
