@@ -1,11 +1,13 @@
 package kotbot.wrapper
 
 import kotbot.KotBot
+import kotbot.modules.base.BaseModule
 import sx.blah.discord.api.ClientBuilder
 import sx.blah.discord.api.IDiscordClient
 import sx.blah.discord.handle.IListener
 import sx.blah.discord.handle.impl.events.DiscordDisconnectedEvent
 import sx.blah.discord.handle.impl.events.ReadyEvent
+import sx.blah.discord.modules.ModuleLoader
 
 public class Discord4JWrapper(val email: String, val password: String) {
     
@@ -16,6 +18,8 @@ public class Discord4JWrapper(val email: String, val password: String) {
     var nextClient: IDiscordClient? = null
     
     init {
+        ModuleLoader.addModuleClass(BaseModule::class.java) //Always register the base module
+        
         try {
             currentClient = createClient()
         } catch(e: Exception) {
@@ -44,9 +48,9 @@ public class Discord4JWrapper(val email: String, val password: String) {
     fun close() {
         KotBot.LOGGER.info("Shutting down...")
         isCloseRequested = true
+        fileWatchThread.interrupt()
         currentClient.logout()
         nextClient?.logout()
-        fileWatchThread.interrupt()
     }
     
     private fun createClient(): IDiscordClient {

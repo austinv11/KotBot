@@ -3,6 +3,7 @@ package kotbot.configuration
 import com.google.gson.Gson
 import java.io.File
 import java.util.*
+import kotlin.reflect.jvm.javaType
 import kotlin.reflect.memberProperties
 
 /**
@@ -36,7 +37,7 @@ private fun getCommentForField(field: String, toSearch: Any): String? {
         val property = toSearch.javaClass.kotlin.memberProperties.find { property -> property.name == field }
         val annotation = property?.annotations?.find { annotation -> annotation is Comment }
         if (annotation != null)
-            return (annotation as Comment).comment
+            return "${(annotation as Comment).comment} (${property?.returnType?.javaType?.typeName?.split(".")?.last()})"
     } catch(e: NoSuchFieldException) {}
     
     return null

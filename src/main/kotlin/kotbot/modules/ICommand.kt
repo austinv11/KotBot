@@ -1,7 +1,22 @@
 package kotbot.modules
 
+import kotbot.KotBot
+import sx.blah.discord.api.IDiscordClient
+import sx.blah.discord.handle.obj.IChannel
 import sx.blah.discord.handle.obj.IMessage
 import sx.blah.discord.handle.obj.IUser
+import sx.blah.discord.util.MessageBuilder
+import java.util.*
+
+/**
+ * Extension to format a syntax message for the provided command
+ */
+fun ICommand.formatCommandSyntaxMessage(): String {
+    val joiner = StringJoiner(" ")
+    joiner.add(KotBot.CONFIG.commandPrefix+this.name)
+    this.parameterNames.forEach { joiner.add("<$it>") }
+    return "${MessageBuilder.Styles.INLINE_CODE}${joiner.toString()}${MessageBuilder.Styles.INLINE_CODE}"
+}
 
 /**
  * This represents a command.
@@ -31,5 +46,5 @@ interface ICommand {
     /**
      * Commands are invoked when it is detected in chat. Returns whether the command was successful or not.
      */
-    open operator fun invoke(params: List<String>, message: IMessage, author: IUser = message.author): Boolean
+    open operator fun invoke(client: IDiscordClient, params: List<String>, message: IMessage, author: IUser = message.author, channel: IChannel = message.channel): Boolean
 }

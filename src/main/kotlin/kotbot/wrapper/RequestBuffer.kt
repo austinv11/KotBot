@@ -20,6 +20,8 @@ fun <T> bufferedRequest(action: () -> T?): FutureValue<T> {
                 bufferedRequest { value.run() }
             }
         }, e.retryDelay)
+    } catch (e: Exception) {
+        KotBot.LOGGER.error("Uncaught error!", e)
     }
     return value
 }

@@ -9,11 +9,18 @@ import org.slf4j.LoggerFactory
 import sx.blah.discord.api.IDiscordClient
 import sx.blah.discord.handle.impl.events.ReadyEvent
 import java.io.File
+import java.time.LocalDateTime
 
 /**
  * A wrapper for Discord4J which allows for continuous uptime even through reloads.
  */
 public fun main(args: Array<String>) {
+    Runtime.getRuntime().addShutdownHook(object: Thread() {
+        override fun run() {
+            KotBot.INSTANCE.client?.logout()
+        }
+    })
+    
     if (KotBot.CONFIG_FILE.exists()) {
         val loadedConfig = KotBot.GSON.fromJsonWithComments<Config>(KotBot.CONFIG_FILE)
         if (loadedConfig != null)
@@ -45,8 +52,14 @@ public class KotBot {
         val GSON = GsonBuilder().setPrettyPrinting().serializeNulls().create()
         val CONFIG_FILE = File("./config.json")
         val INSTANCE = KotBot()
+        val VERSION = "1.0.0-SNAPSHOT"
+        val DISCORD4J_VERSION = "2.3.0"
+        val AUTHOR = "Austin"
+        val STARTUP_TIME = LocalDateTime.now()
+        
         var WRAPPER: Discord4JWrapper? = null
         var CONFIG: Config = Config()
+        var LAST_CLIENT_STARTUP_TIME: LocalDateTime? = null
         
         fun updateConfigFile() {
             KotBot.CONFIG_FILE.writeText(KotBot.GSON.toJsonWithComments(KotBot.CONFIG))
@@ -54,6 +67,7 @@ public class KotBot {
     }
     
     fun onReady(event: ReadyEvent) {
+        LAST_CLIENT_STARTUP_TIME = LocalDateTime.now()
         client = event.client
     }
 }
